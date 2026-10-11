@@ -1,0 +1,20 @@
+{
+  "product": "codeatlas",
+  "timestamp": 1791715745.9018087,
+  "status": "PASSED",
+  "total_benchmark_time_seconds": 4.248,
+  "ast_files_scanned": 37,
+  "total_scanned_symbols": 123,
+  "ast_parse_latency_ms": 27.08,
+  "ast_parse_throughput_fps": 1366.1,
+  "subgraph_traversal_ms": 0.055,
+  "subgraph_nodes_retrieved": 6,
+  "blast_radius_impact_percentage": 33.3,
+  "blast_radius_affected_symbols": 3,
+  "modules_analyzed": 5,
+  "circular_cycles_detected": 0,
+  "rag_latency_ms": 4219.43,
+  "rag_tokens_used": 312,
+  "citations_count": 6,
+  "model": "qwen2.5:0.5b"
+}

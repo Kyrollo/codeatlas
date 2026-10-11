@@ -1,0 +1,83 @@
+<svg width="760" height="340" viewBox="0 0 760 340" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="100%" stop-color="#030712" />
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#3b82f6" />
+    </linearGradient>
+    <linearGradient id="roseGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f43f5e" />
+      <stop offset="100%" stop-color="#fb923c" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="760" height="340" rx="16" fill="url(#bgGrad)" stroke="#1e293b" stroke-width="1.5" />
+
+  <!-- Title & Header -->
+  <text x="32" y="44" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#f8fafc">
+    CodeAtlas Knowledge Graph &amp; AST Symbol RAG Benchmark
+  </text>
+  <text x="32" y="66" font-family="JetBrains Mono, monospace" font-size="11" fill="#94a3b8">
+    Model: qwen2.5:0.5b | GPU: NVIDIA RTX A5000 (16GB VRAM) | Status: PASSED
+  </text>
+
+  <!-- Metric Card 1: AST Parsing -->
+  <g transform="translate(32, 90)">
+    <rect width="210" height="90" rx="10" fill="#111827" stroke="#1f2937" />
+    <text x="16" y="26" font-family="Inter, sans-serif" font-size="11" fill="#94a3b8">AST PARSE THROUGHPUT</text>
+    <text x="16" y="58" font-family="JetBrains Mono, monospace" font-size="22" font-weight="700" fill="#22d3ee">
+      1366.1 <tspan font-size="12" fill="#64748b">files/s</tspan>
+    </text>
+    <text x="16" y="78" font-family="JetBrains Mono, monospace" font-size="10" fill="#10b981">
+      123 symbols indexed in 27.08ms
+    </text>
+  </g>
+
+  <!-- Metric Card 2: Graph Traversal -->
+  <g transform="translate(262, 90)">
+    <rect width="210" height="90" rx="10" fill="#111827" stroke="#1f2937" />
+    <text x="16" y="26" font-family="Inter, sans-serif" font-size="11" fill="#94a3b8">BFS SUBGRAPH TRAVERSAL</text>
+    <text x="16" y="58" font-family="JetBrains Mono, monospace" font-size="22" font-weight="700" fill="#38bdf8">
+      0.055 <tspan font-size="12" fill="#64748b">ms</tspan>
+    </text>
+    <text x="16" y="78" font-family="JetBrains Mono, monospace" font-size="10" fill="#94a3b8">
+      k-hop depth 2 neighborhood
+    </text>
+  </g>
+
+  <!-- Metric Card 3: Local GPU RAG Latency -->
+  <g transform="translate(492, 90)">
+    <rect width="236" height="90" rx="10" fill="#111827" stroke="#1f2937" />
+    <text x="16" y="26" font-family="Inter, sans-serif" font-size="11" fill="#94a3b8">LOCAL GPU RAG LATENCY</text>
+    <text x="16" y="58" font-family="JetBrains Mono, monospace" font-size="22" font-weight="700" fill="#a855f7">
+      4219.43 <tspan font-size="12" fill="#64748b">ms</tspan>
+    </text>
+    <text x="16" y="78" font-family="JetBrains Mono, monospace" font-size="10" fill="#10b981">
+      6 citations grounded (100%)
+    </text>
+  </g>
+
+  <!-- Visual Bars: Blast Radius Impact -->
+  <g transform="translate(32, 210)">
+    <rect width="696" height="100" rx="12" fill="#0f172a" stroke="#1e293b" />
+    <text x="20" y="28" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#f8fafc">
+      Blast Radius Ripple Effect Benchmark (Target: Stripe Payment Gateway)
+    </text>
+    
+    <!-- Bar 1: Direct Dependents -->
+    <text x="20" y="54" font-family="JetBrains Mono, monospace" font-size="10" fill="#94a3b8">Direct Callers</text>
+    <rect x="140" y="44" width="520" height="12" rx="6" fill="#1e293b" />
+    <rect x="140" y="44" width="220" height="12" rx="6" fill="url(#cyanGrad)" />
+    <text x="670" y="54" font-family="JetBrains Mono, monospace" font-size="10" fill="#22d3ee">1 caller</text>
+
+    <!-- Bar 2: Transitive Callers (Blast Radius) -->
+    <text x="20" y="80" font-family="JetBrains Mono, monospace" font-size="10" fill="#94a3b8">Transitive Affected</text>
+    <rect x="140" y="70" width="520" height="12" rx="6" fill="#1e293b" />
+    <rect x="140" y="70" width="380" height="12" rx="6" fill="url(#roseGrad)" />
+    <text x="670" y="80" font-family="JetBrains Mono, monospace" font-size="10" fill="#f43f5e">3 symbols</text>
+  </g>
+</svg>

@@ -1,170 +1,158 @@
 import React, { useEffect, useState } from 'react';
-import { Activity, AlertTriangle, CheckCircle2, ShieldCheck, Sparkles, Terminal } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-
-interface HealthData {
-  status: string;
-  checks?: Record<string, string>;
-  environment?: string;
-}
+import { Header } from './components/Header';
+import { InteractiveGraphTab } from './components/InteractiveGraphTab';
+import { GraphRagTab } from './components/GraphRagTab';
+import { DependencyMatrixTab } from './components/DependencyMatrixTab';
+import { fetchGraph, scanRepository } from './lib/api';
+import { CodebaseGraph, SymbolNode } from './types/codeatlas';
+import {
+  Network,
+  Sparkles,
+  Grid,
+  AlertTriangle,
+  Loader2,
+} from 'lucide-react';
 
 export default function App() {
-  const [health, setHealth] = useState<HealthData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [graph, setGraph] = useState<CodebaseGraph | null>(null);
+  const [activeTab, setActiveTab] = useState<'graph' | 'rag' | 'matrix'>('graph');
+  const [selectedSymbol, setSelectedSymbol] = useState<SymbolNode | null>(null);
+  const [initialSymbolForBlast, setInitialSymbolForBlast] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isScanning, setIsScanning] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function checkHealth() {
-      try {
-        const res = await fetch('/api/v1/readyz');
-        if (!res.ok) {
-          const errData = await res.json().catch(() => ({ detail: res.statusText }));
-          throw new Error(errData.detail || `HTTP ${res.status}`);
-        }
-        const data = await res.json();
-        setHealth(data);
-      } catch (err: any) {
-        setError(err.message || 'Failed to reach API gateway');
-      } finally {
-        setLoading(false);
+  const loadGraph = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const data = await fetchGraph();
+      setGraph(data);
+      if (data.nodes && Object.values(data.nodes).length > 0) {
+        setSelectedSymbol(Object.values(data.nodes)[0]);
       }
+    } catch (err: any) {
+      setError(err.message || 'Failed to load codebase graph');
+    } finally {
+      setIsLoading(false);
     }
-    checkHealth();
+  };
+
+  useEffect(() => {
+    loadGraph();
   }, []);
 
+  const handleScanDirectory = async (path: string) => {
+    try {
+      setIsScanning(true);
+      await scanRepository(path);
+      await loadGraph();
+    } catch (err: any) {
+      alert(`Scanning failed: ${err.message}`);
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
+  const handleInspectBlastRadius = (symbolId: string) => {
+    setInitialSymbolForBlast(symbolId);
+    setActiveTab('matrix');
+  };
+
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
-      {/* Header */}
-      <header className="border-b border-border bg-card/60 backdrop-blur sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center text-white font-bold shadow-sm">
-              C
-            </div>
-            <div>
-              <span className="font-bold text-lg tracking-tight">CodeAtlas</span>
-              <span className="text-xs text-muted-foreground ml-2 hidden sm:inline-block">v1.0.0</span>
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+      <Header
+        projectName={graph?.project_name || 'Codebase'}
+        totalFiles={graph?.total_files || 0}
+        totalSymbols={graph?.total_symbols || 0}
+        onScanDirectory={handleScanDirectory}
+        isScanning={isScanning}
+      />
+
+      {/* Navigation Tabs */}
+      <div className="border-b border-border bg-card/40 px-6">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setActiveTab('graph')}
+            className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition-colors ${
+              activeTab === 'graph'
+                ? 'border-cyan-500 text-cyan-400 bg-cyan-500/5'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Network className="w-4 h-4" />
+            <span>Interactive Knowledge Graph</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('rag')}
+            className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition-colors ${
+              activeTab === 'rag'
+                ? 'border-cyan-500 text-cyan-400 bg-cyan-500/5'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Graph RAG Context Assembler</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('matrix')}
+            className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition-colors ${
+              activeTab === 'matrix'
+                ? 'border-cyan-500 text-cyan-400 bg-cyan-500/5'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Grid className="w-4 h-4" />
+            <span>Dependency Matrix & Blast Radius</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-hidden">
+        {isLoading ? (
+          <div className="h-[calc(100vh-140px)] flex flex-col items-center justify-center gap-3">
+            <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
+            <p className="text-xs text-muted-foreground font-mono">
+              Loading AST symbol graph and architectural layers...
+            </p>
+          </div>
+        ) : error ? (
+          <div className="h-[calc(100vh-140px)] flex flex-col items-center justify-center p-6 text-center">
+            <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 max-w-md">
+              <AlertTriangle className="w-6 h-6 mx-auto mb-2" />
+              <h3 className="text-sm font-semibold">Graph Load Failure</h3>
+              <p className="text-xs mt-1 font-mono text-rose-300">{error}</p>
+              <button
+                onClick={loadGraph}
+                className="mt-3 px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded text-xs font-medium"
+              >
+                Retry
+              </button>
             </div>
           </div>
-
-          <div className="flex items-center gap-3">
-            {loading ? (
-              <Badge variant="outline" className="animate-pulse">Checking...</Badge>
-            ) : error ? (
-              <Badge variant="destructive" className="flex items-center gap-1.5">
-                <AlertTriangle className="w-3.5 h-3.5" /> Degraded
-              </Badge>
-            ) : (
-              <Badge variant="success" className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Operational
-              </Badge>
+        ) : graph ? (
+          <>
+            {activeTab === 'graph' && (
+              <InteractiveGraphTab
+                graph={graph}
+                selectedSymbol={selectedSymbol}
+                onSelectSymbol={setSelectedSymbol}
+                onInspectBlastRadius={handleInspectBlastRadius}
+              />
             )}
-            <Button variant="outline" size="sm" asChild>
-              <a href="/docs" target="_blank" rel="noreferrer">
-                API Docs
-              </a>
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8 space-y-8">
-        {error && (
-          <Alert className="border-red-500/30 bg-red-500/5 text-red-600">
-            <AlertTriangle className="w-4 h-4 text-red-500" />
-            <AlertTitle>Upstream Degraded (RFC 7807 503)</AlertTitle>
-            <AlertDescription className="text-muted-foreground text-xs font-mono">
-              {error} - Backend dependency unavailable. Degraded mode active.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        <div className="space-y-2">
-          <h1 className="text-3xl font-extrabold tracking-tight">CodeAtlas</h1>
-          <p className="text-muted-foreground max-w-3xl leading-relaxed">
-            Codebase Intelligence Platform: hybrid AST/semantic code search, interactive repository Q&A, and auto-generated architecture wikis
-          </p>
-        </div>
-
-        {/* Feature Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center mb-2">
-                <ShieldCheck className="w-4 h-4" />
-              </div>
-              <CardTitle>Verified Production Core</CardTitle>
-              <CardDescription>
-                Strict CI enforcement against mock responses or fake token streams. All endpoints hit real models.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center mb-2">
-                <Activity className="w-4 h-4" />
-              </div>
-              <CardTitle>Observability Stack</CardTitle>
-              <CardDescription>
-                Prometheus metrics, OpenTelemetry spans, and Langfuse tracing integrated into every inference call.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center mb-2">
-                <Sparkles className="w-4 h-4" />
-              </div>
-              <CardTitle>Unique UI Archetype</CardTitle>
-              <CardDescription>
-                Tailored for IDE (VS Code style) workflows with custom tokens and typography.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
-
-        {/* System Status Panel */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Terminal className="w-4 h-4 text-primary" /> Live Cluster Connectivity
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-muted/50 rounded-lg p-4 font-mono text-xs space-y-2">
-              <div className="flex justify-between border-b border-border/50 pb-2">
-                <span className="text-muted-foreground">Gateway Port:</span>
-                <span>8004</span>
-              </div>
-              <div className="flex justify-between border-b border-border/50 pb-2">
-                <span className="text-muted-foreground">Frontend Port:</span>
-                <span>3004</span>
-              </div>
-              <div className="flex justify-between border-b border-border/50 pb-2">
-                <span className="text-muted-foreground">LLM Provider:</span>
-                <span>Ollama / Local GPU (Fallback: Cloud)</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Cluster Readiness:</span>
-                <span className={health?.status === 'ready' ? 'text-emerald-500' : 'text-amber-500'}>
-                  {health?.status || 'connecting'}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            {activeTab === 'rag' && <GraphRagTab graph={graph} />}
+            {activeTab === 'matrix' && (
+              <DependencyMatrixTab
+                graph={graph}
+                initialSymbolId={initialSymbolForBlast || selectedSymbol?.id}
+              />
+            )}
+          </>
+        ) : null}
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">
-        CodeAtlas &bull; Autonomous AI Production Stack &bull; Licensed under MIT
-      </footer>
     </div>
   );
 }
