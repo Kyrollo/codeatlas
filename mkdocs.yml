@@ -1,0 +1,46 @@
+site_name: CodeAtlas Documentation
+site_description: Codebase Intelligence Platform: hybrid AST/semantic code search, interactive repository Q&A, and auto-generated architecture wikis
+site_author: Kyrollo
+repo_url: https://github.com/Kyrollo/codeatlas
+repo_name: Kyrollo/codeatlas
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Overview: index.md
+  - Architecture: architecture.md
+  - API Reference: api.md
+  - Evaluation: evaluation.md
+  - Operations & Runbook: operations.md
+  - Security Model: security.md
