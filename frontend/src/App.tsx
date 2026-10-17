@@ -5,17 +5,19 @@ import { GraphRagTab } from './components/GraphRagTab';
 import { DependencyMatrixTab } from './components/DependencyMatrixTab';
 import { fetchGraph, scanRepository } from './lib/api';
 import { CodebaseGraph, SymbolNode } from './types/codeatlas';
+import { FileUploadZone } from './components/FileUploadZone';
 import {
   Network,
   Sparkles,
   Grid,
   AlertTriangle,
   Loader2,
+  FolderUp,
 } from 'lucide-react';
 
 export default function App() {
   const [graph, setGraph] = useState<CodebaseGraph | null>(null);
-  const [activeTab, setActiveTab] = useState<'graph' | 'rag' | 'matrix'>('graph');
+  const [activeTab, setActiveTab] = useState<'graph' | 'rag' | 'matrix' | 'uploads'>('graph');
   const [selectedSymbol, setSelectedSymbol] = useState<SymbolNode | null>(null);
   const [initialSymbolForBlast, setInitialSymbolForBlast] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -107,6 +109,18 @@ export default function App() {
             <Grid className="w-4 h-4" />
             <span>Dependency Matrix & Blast Radius</span>
           </button>
+
+          <button
+            onClick={() => setActiveTab('uploads')}
+            className={`py-3 px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition-colors ${
+              activeTab === 'uploads'
+                ? 'border-cyan-500 text-cyan-400 bg-cyan-500/5'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <FolderUp className="w-4 h-4" />
+            <span>Source Code & ZIP Upload</span>
+          </button>
         </div>
       </div>
 
@@ -133,9 +147,9 @@ export default function App() {
               </button>
             </div>
           </div>
-        ) : graph ? (
+        ) : (
           <>
-            {activeTab === 'graph' && (
+            {activeTab === 'graph' && graph && (
               <InteractiveGraphTab
                 graph={graph}
                 selectedSymbol={selectedSymbol}
@@ -143,15 +157,33 @@ export default function App() {
                 onInspectBlastRadius={handleInspectBlastRadius}
               />
             )}
-            {activeTab === 'rag' && <GraphRagTab graph={graph} />}
-            {activeTab === 'matrix' && (
+            {activeTab === 'rag' && graph && <GraphRagTab graph={graph} />}
+            {activeTab === 'matrix' && graph && (
               <DependencyMatrixTab
                 graph={graph}
                 initialSymbolId={initialSymbolForBlast || selectedSymbol?.id}
               />
             )}
+            {activeTab === 'uploads' && (
+              <div className="p-6 max-w-5xl mx-auto space-y-4 overflow-y-auto max-h-[calc(100vh-140px)]">
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">Source Code & Repository Archive Upload</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Upload single files (.py, .ts, .js) or full project ZIP archives to parse AST nodes and extract dependency graphs.
+                  </p>
+                </div>
+                <FileUploadZone
+                  apiBaseUrl="/api/v1"
+                  allowedExtensions={['.py', '.ts', '.tsx', '.js', '.jsx', '.json', '.zip', '.md', '.txt']}
+                  acceptedFormatsText="Python (.py), TypeScript (.ts/.tsx), JavaScript, JSON, ZIP"
+                  onFileProcessed={() => {
+                    loadGraph();
+                  }}
+                />
+              </div>
+            )}
           </>
-        ) : null}
+        )}
       </main>
     </div>
   );

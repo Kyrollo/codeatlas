@@ -17,6 +17,7 @@ import {
   Boxes,
   Zap,
 } from 'lucide-react';
+import { MarkdownRenderer } from './MarkdownRenderer';
 
 interface GraphRagTabProps {
   graph: CodebaseGraph;
@@ -219,9 +220,7 @@ export const GraphRagTab: React.FC<GraphRagTabProps> = ({ graph }) => {
                     <CheckCircle2 className="w-4 h-4 text-cyan-400" />
                     <span>Ollama Verified Analysis</span>
                   </div>
-                  <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap font-sans">
-                    {result.answer}
-                  </div>
+                  <MarkdownRenderer content={result.answer} defaultMaxHeight="max-h-[500px]" />
                 </div>
 
                 {/* Grounded Citations */}

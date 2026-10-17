@@ -8,6 +8,7 @@ from .symbols import router as symbols_router
 from .dependencies import router as dependencies_router
 from .rag import router as rag_router
 from .index import router as index_router
+from .files import router as files_router
 
 api_v1_router = APIRouter()
 api_v1_router.include_router(health_router)
@@ -17,6 +18,7 @@ api_v1_router.include_router(symbols_router)
 api_v1_router.include_router(dependencies_router)
 api_v1_router.include_router(rag_router)
 api_v1_router.include_router(index_router)
+api_v1_router.include_router(files_router)
 
 
 @api_v1_router.get("/info", tags=["info"])

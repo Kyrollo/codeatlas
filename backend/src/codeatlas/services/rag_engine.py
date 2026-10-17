@@ -126,7 +126,7 @@ async def execute_graph_rag_query(
             {"role": "user", "content": user_prompt},
         ],
         "temperature": 0.2,
-        "max_tokens": 512,
+        "max_tokens": 2048,
     }
     headers = {
         "Authorization": f"Bearer {settings.LLM_API_KEY}",
