@@ -2,7 +2,7 @@
 
 - **Date**: 2026-10-11
 - **Status**: **PASSED**
-- **Target Model**: `qwen2.5:0.5b` running on local **NVIDIA RTX A5000 Laptop GPU (16GB VRAM)**
+- **Target Model**: `qwen2.5:0.5b` running on local **Dedicated NVIDIA GPU (16GB VRAM)**
 - **Total Latency**: 4.248s
 
 ## Performance Telemetry

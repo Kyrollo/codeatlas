@@ -53,7 +53,7 @@ def generate_metrics_svg(report: dict, output_path: Path) -> None:
     CodeAtlas Knowledge Graph &amp; AST Symbol RAG Benchmark
   </text>
   <text x="32" y="66" font-family="JetBrains Mono, monospace" font-size="11" fill="#94a3b8">
-    Model: {report.get('model', 'qwen2.5:0.5b')} | GPU: NVIDIA RTX A5000 (16GB VRAM) | Status: {report.get('status', 'PASSED')}
+    Model: {report.get('model', 'qwen2.5:0.5b')} | GPU: Dedicated NVIDIA GPU (16GB VRAM) | Status: {report.get('status', 'PASSED')}
   </text>
 
   <!-- Metric Card 1: AST Parsing -->
@@ -206,7 +206,7 @@ async def run_benchmark() -> int:
 
 - **Date**: 2026-10-11
 - **Status**: **{report['status']}**
-- **Target Model**: `{report['model']}` running on local **NVIDIA RTX A5000 Laptop GPU (16GB VRAM)**
+- **Target Model**: `{report['model']}` running on local **Dedicated NVIDIA GPU (16GB VRAM)**
 - **Total Latency**: {report['total_benchmark_time_seconds']}s
 
 ## Performance Telemetry

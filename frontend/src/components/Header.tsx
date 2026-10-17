@@ -72,7 +72,7 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="text-border">|</span>
             <div className="flex items-center gap-1.5 text-emerald-400 font-medium">
               <Cpu className="w-3.5 h-3.5" />
-              <span>GPU: RTX A5000</span>
+              <span>GPU: Dedicated NVIDIA GPU</span>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             </div>
           </div>

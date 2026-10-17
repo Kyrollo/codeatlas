@@ -26,7 +26,7 @@ flowchart TD
     end
 
     subgraph GPUInference["Local GPU Compute"]
-        Ollama["Ollama Engine (Local GPU: RTX A5000)\nModel: qwen2.5:0.5b (Port 11434)"]
+        Ollama["Ollama Engine (Local GPU: Dedicated NVIDIA GPU)\nModel: qwen2.5:0.5b (Port 11434)"]
     end
 
     Dev -->|Visualizes Graph & Queries| Frontend
@@ -55,7 +55,7 @@ sequenceDiagram
     participant API as FastAPI Gateway
     participant RAG as RAG Assembler
     participant Store as Graph Store
-    participant GPU as Local Ollama GPU (RTX A5000)
+    participant GPU as Local Ollama GPU (Dedicated NVIDIA GPU)
 
     Engineer->>UI: Enters Architectural Question ("How does checkout invoke Stripe?")
     UI->>API: POST /api/v1/rag/query
@@ -86,6 +86,6 @@ sequenceDiagram
 | **Backend Framework** | FastAPI (Python 3.12) | High-throughput asynchronous endpoints with Pydantic v2 schemas and RFC 7807 problem details. |
 | **AST Parser** | Python native `ast` | Sub-millisecond parsing throughput (>1,300 files/s), extracting classes, methods, docstrings, and cyclomatic complexity. |
 | **Graph Engine** | In-memory Adjacency BFS & Inverted Index | Instant k-hop neighborhood extractions (<0.1ms) and deterministic cycle / blast radius computation. |
-| **Inference Engine** | Ollama local GPU (`qwen2.5:0.5b`) | Zero external API dependencies; private, fast (<4.2s), low-VRAM memory footprint on NVIDIA RTX A5000. |
+| **Inference Engine** | Ollama local GPU (`qwen2.5:0.5b`) | Zero external API dependencies; private, fast (<4.2s), low-VRAM memory footprint on NVIDIA Dedicated NVIDIA GPU. |
 | **Frontend UI** | React 18 + TypeScript + Tailwind CSS | Bespoke 2D SVG graph canvas with radial module clustering, token budget meters, and coupling heatmap tables. |
 | **Zero-Simulation** | Enforced by automated guard script | No synthetic data or fallback sleep loops; strictly real parsing and real GPU inference. |
