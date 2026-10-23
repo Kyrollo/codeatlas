@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "codeatlas"
 version = "1.0.0"
 description = "Codebase Intelligence Platform: hybrid AST/semantic code search, interactive repository Q&A, and auto-generated architecture wikis"
-readme = "../README.md"
+readme = "README.md"
 authors = [{ name = "Kyrollo", email = "kyrollo@users.noreply.github.com" }]
 requires-python = ">=3.12"
 dependencies = [
